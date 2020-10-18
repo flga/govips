@@ -56,7 +56,7 @@ before_install:
     cd ../..
 
 before_script:
-  - go get -u golang.org/x/lint
+  - go get -u golang.org/x/lint/golint
 
 script:
   - |
