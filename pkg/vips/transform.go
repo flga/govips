@@ -394,12 +394,12 @@ func (t *Transform) exportImage(image *C.VipsImage, imageType ImageType) ([]byte
 		return nil, ImageTypeUnknown, err
 	}
 
-	if t.export.Writer != nil {
-		_, err = t.export.Writer.Write(buf)
-		if err != nil {
-			return buf, format, err
-		}
-	}
+	// if t.export.Writer != nil {
+	// 	_, err = t.export.Writer.Write(buf)
+	// 	if err != nil {
+	// 		return buf, format, err
+	// 	}
+	// }
 
 	return buf, format, err
 }

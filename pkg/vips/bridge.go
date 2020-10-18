@@ -10,6 +10,8 @@ import (
 	"runtime"
 	dbg "runtime/debug"
 	"unsafe"
+
+	"github.com/mattn/go-pointer"
 )
 
 const (
@@ -198,22 +200,47 @@ func vipsExportBuffer(image *C.VipsImage, params *ExportParams) ([]byte, ImageTy
 		}
 	}
 
-	var ptr unsafe.Pointer
+	var (
+		ptr    unsafe.Pointer
+		wp     unsafe.Pointer
+		target *C.VipsTarget
+	)
+	if params.Writer != nil {
+		wp = pointer.Save(params.Writer)
+		defer pointer.Unref(wp)
+		target = C.govips_new_writer_target(wp)
+	}
 
 	switch format {
 	case ImageTypeWEBP:
 		incOpCounter("save_webp_buffer")
-		cErr = C.save_webp_buffer(tmpImage, &ptr, &cLen, stripMetadata, quality, lossless)
+		if target == nil {
+			cErr = C.save_webp_buffer(tmpImage, &ptr, &cLen, stripMetadata, quality, lossless)
+		} else {
+			cErr = C.save_webp_buffer_to_target(tmpImage, target, stripMetadata, quality, lossless)
+		}
 	case ImageTypePNG:
 		incOpCounter("save_png_buffer")
-		cErr = C.save_png_buffer(tmpImage, &ptr, &cLen, stripMetadata, C.int(params.Compression), quality, interlaced)
+		if target == nil {
+			cErr = C.save_png_buffer(tmpImage, &ptr, &cLen, stripMetadata, C.int(params.Compression), quality, interlaced)
+		} else {
+			cErr = C.save_png_buffer_to_target(tmpImage, target, stripMetadata, C.int(params.Compression), quality, interlaced)
+		}
 	case ImageTypeTIFF:
 		incOpCounter("save_tiff_buffer")
-		cErr = C.save_tiff_buffer(tmpImage, &ptr, &cLen)
+		if target == nil {
+			cErr = C.save_tiff_buffer(tmpImage, &ptr, &cLen)
+		} else {
+			cErr = C.save_tiff_buffer_to_target(tmpImage, target)
+		}
 	default:
 		incOpCounter("save_jpeg_buffer")
 		format = ImageTypeJPEG
-		cErr = C.save_jpeg_buffer(tmpImage, &ptr, &cLen, stripMetadata, quality, interlaced)
+		if target == nil {
+			cErr = C.save_jpeg_buffer(tmpImage, &ptr, &cLen, stripMetadata, quality, interlaced)
+		} else {
+			cErr = C.save_jpeg_buffer_to_target(tmpImage, target, stripMetadata, quality, interlaced)
+		}
 	}
 
 	if int(cErr) != 0 {

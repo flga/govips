@@ -67,8 +67,34 @@ int save_jpeg_buffer(VipsImage *in, void **buf, size_t *len, int strip, int qual
 	);
 }
 
+int save_jpeg_buffer_to_target(VipsImage *in, VipsTarget *target, int strip, int quality, int interlace) {
+	return vips_image_write_to_target(
+		in,
+		".jpg",
+		target,
+		"strip", INT_TO_GBOOLEAN(strip),
+		"Q", quality,
+		"optimize_coding", TRUE,
+		"interlace", INT_TO_GBOOLEAN(interlace),
+		NULL
+	);
+}
+
 int save_png_buffer(VipsImage *in, void **buf, size_t *len, int strip, int compression, int quality, int interlace) {
 	return vips_pngsave_buffer(in, buf, len,
+		"strip", INT_TO_GBOOLEAN(strip),
+		"compression", compression,
+		"interlace", INT_TO_GBOOLEAN(interlace),
+		"filter", VIPS_FOREIGN_PNG_FILTER_NONE,
+		NULL
+	);
+}
+
+int save_png_buffer_to_target(VipsImage *in, VipsTarget *target, int strip, int compression, int quality, int interlace) {
+	return vips_image_write_to_target(
+		in,
+		".png",
+		target,
 		"strip", INT_TO_GBOOLEAN(strip),
 		"compression", compression,
 		"interlace", INT_TO_GBOOLEAN(interlace),
@@ -86,8 +112,29 @@ int save_webp_buffer(VipsImage *in, void **buf, size_t *len, int strip, int qual
 	);
 }
 
+int save_webp_buffer_to_target(VipsImage *in, VipsTarget *target, int strip, int quality, int lossless) {
+	return vips_image_write_to_target(
+		in,
+		".webp",
+		target,
+		"strip", INT_TO_GBOOLEAN(strip),
+		"Q", quality,
+		"lossless", INT_TO_GBOOLEAN(lossless),
+		NULL
+	);
+}
+
 int save_tiff_buffer(VipsImage *in, void **buf, size_t *len) {
 	return vips_tiffsave_buffer(in, buf, len, NULL);
+}
+
+int save_tiff_buffer_to_target(VipsImage *in, VipsTarget *target) {
+	return vips_image_write_to_target(
+		in,
+		".tiff",
+		target,
+		NULL
+	);
 }
 
 int is_colorspace_supported(VipsImage *in) {

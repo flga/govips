@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <vips/vips.h>
 #include <vips/foreign.h>
+#include <vips/connection.h>
 
 #if (VIPS_MAJOR_VERSION < 8)
   error_requires_version_8
@@ -37,14 +38,20 @@ typedef struct {
 	int access;
 } ImageLoadOptions;
 
+VipsTarget* govips_new_writer_target(void* user);
+
 int init_image(void *buf, size_t len, int imageType, ImageLoadOptions *o, VipsImage **out);
 int find_image_type_loader(int t);
 int find_image_type_saver(int t);
 
 int save_jpeg_buffer(VipsImage* image, void **buf, size_t *len, int strip, int quality, int interlace);
+int save_jpeg_buffer_to_target(VipsImage* image, VipsTarget *target, int strip, int quality, int interlace);
 int save_png_buffer(VipsImage *in, void **buf, size_t *len, int strip, int compression, int quality, int interlace);
+int save_png_buffer_to_target(VipsImage *in, VipsTarget *target, int strip, int compression, int quality, int interlace);
 int save_webp_buffer(VipsImage *in, void **buf, size_t *len, int strip, int quality, int lossless);
+int save_webp_buffer_to_target(VipsImage *in, VipsTarget *target, int strip, int quality, int lossless);
 int save_tiff_buffer(VipsImage *in, void **buf, size_t *len);
+int save_tiff_buffer_to_target(VipsImage *in, VipsTarget *target);
 int load_jpeg_buffer(void *buf, size_t len, VipsImage **out, int shrink);
 int copy_image(VipsImage *in, VipsImage **out);
 
