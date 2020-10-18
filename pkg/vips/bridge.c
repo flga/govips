@@ -33,10 +33,6 @@ int init_image(void *buf, size_t len, int imageType, ImageLoadOptions *o, VipsIm
 	return code;
 }
 
-VipsAngle autorot_get_angle(VipsImage *img) {
-	return vips_autorot_get_angle(img);
-}
-
 unsigned long has_profile_embed(VipsImage *in) {
 	return vips_image_get_typeof(in, VIPS_META_ICC_NAME);
 }
@@ -68,9 +64,8 @@ int save_jpeg_buffer(VipsImage *in, void **buf, size_t *len, int strip, int qual
 }
 
 int save_jpeg_buffer_to_target(VipsImage *in, VipsTarget *target, int strip, int quality, int interlace) {
-	return vips_image_write_to_target(
+	return vips_jpegsave_target(
 		in,
-		".jpg",
 		target,
 		"strip", INT_TO_GBOOLEAN(strip),
 		"Q", quality,
@@ -91,9 +86,8 @@ int save_png_buffer(VipsImage *in, void **buf, size_t *len, int strip, int compr
 }
 
 int save_png_buffer_to_target(VipsImage *in, VipsTarget *target, int strip, int compression, int quality, int interlace) {
-	return vips_image_write_to_target(
+	return vips_pngsave_target(
 		in,
-		".png",
 		target,
 		"strip", INT_TO_GBOOLEAN(strip),
 		"compression", compression,
@@ -113,9 +107,8 @@ int save_webp_buffer(VipsImage *in, void **buf, size_t *len, int strip, int qual
 }
 
 int save_webp_buffer_to_target(VipsImage *in, VipsTarget *target, int strip, int quality, int lossless) {
-	return vips_image_write_to_target(
+	return vips_webpsave_target(
 		in,
-		".webp",
 		target,
 		"strip", INT_TO_GBOOLEAN(strip),
 		"Q", quality,
@@ -133,6 +126,26 @@ int save_tiff_buffer_to_target(VipsImage *in, VipsTarget *target) {
 		in,
 		".tiff",
 		target,
+		NULL
+	);
+}
+
+int save_avif_buffer(VipsImage *in, void **buf, size_t *len, int quality, int lossless) {
+	return vips_heifsave_buffer(in, buf, len,
+		"Q", quality,
+		"lossless", INT_TO_GBOOLEAN(lossless),
+		"compression", VIPS_FOREIGN_HEIF_COMPRESSION_AV1,
+	 	NULL
+	);
+}
+
+int save_avif_buffer_to_target(VipsImage *in, VipsTarget *target, int quality, int lossless) {
+	return vips_heifsave_target(
+		in,
+		target,
+		"Q", quality,
+		"lossless", INT_TO_GBOOLEAN(lossless),
+		"compression", VIPS_FOREIGN_HEIF_COMPRESSION_AV1,
 		NULL
 	);
 }

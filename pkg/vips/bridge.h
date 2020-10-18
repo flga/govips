@@ -18,7 +18,8 @@ enum types {
 	GIF,
 	PDF,
 	SVG,
-	MAGICK
+	MAGICK,
+	AVIF
 };
 typedef struct {
   const char *Text;
@@ -52,6 +53,9 @@ int save_webp_buffer(VipsImage *in, void **buf, size_t *len, int strip, int qual
 int save_webp_buffer_to_target(VipsImage *in, VipsTarget *target, int strip, int quality, int lossless);
 int save_tiff_buffer(VipsImage *in, void **buf, size_t *len);
 int save_tiff_buffer_to_target(VipsImage *in, VipsTarget *target);
+int save_avif_buffer(VipsImage *in, void **buf, size_t *len, int quality, int lossless);
+int save_avif_buffer_to_target(VipsImage *in, VipsTarget *target, int quality, int lossless);
+
 int load_jpeg_buffer(void *buf, size_t len, VipsImage **out, int shrink);
 int copy_image(VipsImage *in, VipsImage **out);
 
@@ -61,7 +65,6 @@ unsigned long has_profile_embed(VipsImage *in);
 int remove_icc_profile(VipsImage *in);
 int extract_band(VipsImage *in, VipsImage **out, int band, int num);
 int linear1(VipsImage *in, VipsImage **out, double a, double b);
-VipsAngle autorot_get_angle(VipsImage *img);
 
 // Operations
 int add(VipsImage *left, VipsImage *right, VipsImage **out);

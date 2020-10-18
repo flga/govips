@@ -100,6 +100,7 @@ const (
 	ImageTypeSVG     ImageType = C.SVG
 	ImageTypeTIFF    ImageType = C.TIFF
 	ImageTypeWEBP    ImageType = C.WEBP
+	ImageTypeAVIF    ImageType = C.AVIF
 )
 
 var imageTypeExtensionMap = map[ImageType]string{
@@ -111,6 +112,7 @@ var imageTypeExtensionMap = map[ImageType]string{
 	ImageTypeSVG:    ".svg",
 	ImageTypeTIFF:   ".tiff",
 	ImageTypeWEBP:   ".webp",
+	ImageTypeAVIF:   ".avif",
 }
 
 // OutputExt returns the canonical extension for the ImageType
@@ -379,6 +381,7 @@ var ImageTypes = map[ImageType]string{
 	ImageTypeSVG:    "svg",
 	ImageTypeTIFF:   "tiff",
 	ImageTypeWEBP:   "webp",
+	ImageTypeAVIF:   "heif",
 }
 
 type Composite struct {
@@ -460,7 +463,7 @@ func initTypes() {
 			ret := C.vips_type_find(
 				cType,
 				cFunc)
-			debug("Registered image type loader type=%s", v)
+			debug("Registered image type loader type=%s, %v", v, int(ret) != 0)
 			supportedImageTypes[k] = int(ret) != 0
 		}
 	})

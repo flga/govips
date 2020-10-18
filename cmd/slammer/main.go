@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -69,19 +70,20 @@ func run(dir string) (int, error) {
 		if err != nil {
 			return 0, err
 		}
+		var buf bytes.Buffer
 		tx := vips.NewTransform().
 			Image(imageRef).
 			ResizeStrategy(vips.ResizeStrategyCrop).
 			ScaleWidth(x).
 			ScaleHeight(y).
 			Format(vips.ImageTypeJPEG).
-			OutputBytes()
-		b, _, err := tx.Apply()
+			Output(&buf)
+		_, _, err = tx.Apply()
 		if err != nil {
 			return 0, err
 		}
-		total += len(b)
-		fmt.Printf("Processed file=%s w=%v h=%v bytes=%d\n", f, x, y, len(b))
+		total += buf.Len()
+		fmt.Printf("Processed file=%s w=%v h=%v bytes=%d\n", f, x, y, buf.Len())
 		imageRef.Close()
 	}
 

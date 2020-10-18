@@ -87,10 +87,6 @@ func vipsCallOperation(operation *C.VipsOperation, options []*Option) error {
 	return nil
 }
 
-func vipsAutorotGetAngle(image *C.VipsImage) Angle {
-	return Angle(C.autorot_get_angle(image))
-}
-
 func vipsHasProfile(input *C.VipsImage) bool {
 	return int(C.has_profile_embed(input)) > 0
 }
@@ -233,6 +229,13 @@ func vipsExportBuffer(image *C.VipsImage, params *ExportParams) ([]byte, ImageTy
 		} else {
 			cErr = C.save_tiff_buffer_to_target(tmpImage, target)
 		}
+	case ImageTypeAVIF:
+		incOpCounter("save_avif_buffer")
+		if target == nil {
+			cErr = C.save_avif_buffer(tmpImage, &ptr, &cLen, quality, lossless)
+		} else {
+			cErr = C.save_avif_buffer_to_target(tmpImage, target, quality, lossless)
+		}
 	default:
 		incOpCounter("save_jpeg_buffer")
 		format = ImageTypeJPEG
@@ -241,6 +244,10 @@ func vipsExportBuffer(image *C.VipsImage, params *ExportParams) ([]byte, ImageTy
 		} else {
 			cErr = C.save_jpeg_buffer_to_target(tmpImage, target, stripMetadata, quality, interlaced)
 		}
+	}
+
+	if target != nil {
+		C.g_object_unref(C.gpointer(target))
 	}
 
 	if int(cErr) != 0 {
